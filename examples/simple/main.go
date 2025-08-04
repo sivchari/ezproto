@@ -31,7 +31,7 @@ func HelperGenerator(ctx *ezproto.Context, file *ezproto.File) error {
 				cb.Return("&" + msg.GoName() + "Helper{msg: msg}")
 			}).
 			EmptyLine()
-		
+
 		// Debug: show field information including enums, maps, oneofs
 		for _, field := range msg.Fields() {
 			var fieldInfo string
@@ -46,7 +46,7 @@ func HelperGenerator(ctx *ezproto.Context, file *ezproto.File) error {
 			}
 			code.Comment("Field " + field.GoName() + ": " + fieldInfo)
 		}
-		
+
 		for _, oneof := range msg.Oneofs() {
 			code.Comment("Oneof: " + oneof.GoName())
 		}

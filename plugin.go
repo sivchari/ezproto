@@ -9,19 +9,23 @@ import (
 	"google.golang.org/protobuf/compiler/protogen"
 )
 
+// GeneratorFunc is a function that generates code for a given proto file.
 type GeneratorFunc func(ctx *Context, file *File) error
 
+// Options contains configuration options for the plugin.
 type Options struct {
 	Debug          bool
 	PackageMapping map[string]string
 }
 
+// Plugin represents an ezproto code generator plugin.
 type Plugin struct {
 	options          Options
 	generators       map[string]GeneratorFunc
 	parameterHandler func(params map[string]string, options *Options)
 }
 
+// NewPlugin creates a new Plugin instance.
 func NewPlugin() *Plugin {
 	return &Plugin{
 		options: Options{
@@ -32,39 +36,45 @@ func NewPlugin() *Plugin {
 	}
 }
 
+// WithOptions sets the plugin options and returns the plugin for chaining.
 func (p *Plugin) WithOptions(opts Options) *Plugin {
 	p.options = opts
 	if p.options.PackageMapping == nil {
 		p.options.PackageMapping = make(map[string]string)
 	}
+
 	return p
 }
 
+// GenerateFor registers a generator function for files matching the given pattern.
 func (p *Plugin) GenerateFor(pattern string, generator GeneratorFunc) *Plugin {
 	p.generators[pattern] = generator
+
 	return p
 }
 
-// WithParameterHandler sets a custom parameter handler
+// WithParameterHandler sets a custom parameter handler.
 func (p *Plugin) WithParameterHandler(handler func(params map[string]string, options *Options)) *Plugin {
 	p.parameterHandler = handler
+
 	return p
 }
 
+// Run executes the plugin by processing proto files with protoc.
 func (p *Plugin) Run() error {
 	opts := protogen.Options{}
 	opts.Run(func(gen *protogen.Plugin) error {
 		// Parse plugin parameters
 		params := parseParameters(gen.Request.GetParameter())
-		
+
 		// Update plugin options with parsed parameters
 		p.updateOptionsFromParams(params)
-		
+
 		// Call custom parameter handler if provided
 		if p.parameterHandler != nil {
 			p.parameterHandler(params, &p.options)
 		}
-		
+
 		for _, f := range gen.Files {
 			if !f.Generate {
 				continue
@@ -87,25 +97,27 @@ func (p *Plugin) Run() error {
 					if p.options.Debug {
 						fmt.Fprintf(os.Stderr, "[DEBUG] Generating for %s with pattern %s\n", f.Desc.Path(), pattern)
 					}
-					
+
 					if err := generator(ctx, file); err != nil {
 						return fmt.Errorf("generator failed for %s: %w", f.Desc.Path(), err)
 					}
 				}
 			}
 		}
+
 		return nil
 	})
+
 	return nil
 }
 
-// parseParameters parses plugin parameters from protoc
+// parseParameters parses plugin parameters from protoc.
 func parseParameters(parameter string) map[string]string {
 	params := make(map[string]string)
 	if parameter == "" {
 		return params
 	}
-	
+
 	// Split by comma: "key1=value1,key2=value2"
 	pairs := strings.Split(parameter, ",")
 	for _, pair := range pairs {
@@ -116,11 +128,11 @@ func parseParameters(parameter string) map[string]string {
 			params[strings.TrimSpace(pair)] = "true"
 		}
 	}
-	
+
 	return params
 }
 
-// updateOptionsFromParams updates plugin options from parsed parameters
+// updateOptionsFromParams updates plugin options from parsed parameters.
 func (p *Plugin) updateOptionsFromParams(params map[string]string) {
 	for key, value := range params {
 		switch key {
@@ -132,6 +144,7 @@ func (p *Plugin) updateOptionsFromParams(params map[string]string) {
 				if p.options.PackageMapping == nil {
 					p.options.PackageMapping = make(map[string]string)
 				}
+
 				p.options.PackageMapping[mapping[0]] = mapping[1]
 			}
 		}
@@ -142,10 +155,11 @@ func (p *Plugin) matchesPattern(path, pattern string) bool {
 	if pattern == "*" || pattern == "*.proto" {
 		return true
 	}
-	
+
 	matched, err := filepath.Match(pattern, path)
 	if err != nil {
 		return strings.Contains(path, strings.TrimSuffix(pattern, "*"))
 	}
+
 	return matched
 }
