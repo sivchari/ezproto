@@ -1,0 +1,78 @@
+// Generated from test.proto
+package main
+
+// Enum: UserStatus (example.UserStatus)
+// Enum: Priority (example.Priority)
+
+// Message: User
+type UserHelper struct {
+	msg *User
+}
+
+func NewUserHelper(msg *User) *UserHelper {
+	return &UserHelper{msg: msg}
+}
+
+// Field Id: scalar field: int32
+// Field Name: scalar field: string
+// Field Email: scalar field: string
+// Field Tags: scalar field: string
+// Field Status: enum field: example.UserStatus
+// Field Metadata: map field
+// Field Phone: scalar field: string
+// Field SlackId: scalar field: string
+// Oneof: ContactInfo
+
+// Message: CreateUserRequest
+type CreateUserRequestHelper struct {
+	msg *CreateUserRequest
+}
+
+func NewCreateUserRequestHelper(msg *CreateUserRequest) *CreateUserRequestHelper {
+	return &CreateUserRequestHelper{msg: msg}
+}
+
+// Field User: message field: example.User
+// Field Priority: enum field: example.Priority
+// Field Settings: map field
+
+// Message: CreateUserResponse
+type CreateUserResponseHelper struct {
+	msg *CreateUserResponse
+}
+
+func NewCreateUserResponseHelper(msg *CreateUserResponse) *CreateUserResponseHelper {
+	return &CreateUserResponseHelper{msg: msg}
+}
+
+// Field User: message field: example.User
+// Field Message: scalar field: string
+// Field ResultStatus: enum field: example.UserStatus
+
+// Message: GetUserRequest
+type GetUserRequestHelper struct {
+	msg *GetUserRequest
+}
+
+func NewGetUserRequestHelper(msg *GetUserRequest) *GetUserRequestHelper {
+	return &GetUserRequestHelper{msg: msg}
+}
+
+// Field Id: scalar field: int32
+
+// Message: ListUsersRequest
+type ListUsersRequestHelper struct {
+	msg *ListUsersRequest
+}
+
+func NewListUsersRequestHelper(msg *ListUsersRequest) *ListUsersRequestHelper {
+	return &ListUsersRequestHelper{msg: msg}
+}
+
+// Field Limit: scalar field: int32
+
+// Service: UserService
+// Method: CreateUserRequest -> CreateUserResponse
+// Method: GetUserRequest -> User
+// Method: ListUsersRequest -> User (streaming)
+
